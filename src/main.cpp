@@ -10,7 +10,7 @@
 // 立方体256個＊3次元ぶんの値を保存するためのグローバル変数
 double pos[3*256];
 double vel[3*256];
-bool click = false;
+bool clicked = false;
 
 // 登場する関数(いつもの)
 void myinit(GLFWwindow** window);
@@ -120,7 +120,7 @@ void MouseButtonFunc(GLFWwindow* window, int button, int action, int mods)
 {
     if( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS )
     {
-        // click = ???;
+        // clicked = ???;
     }
 }
 
