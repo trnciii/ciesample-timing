@@ -25,10 +25,28 @@ void myinit(GLFWwindow** window)
     int h = 600; // ウィンドウの高さ
     *window = glfwCreateWindow(w, h, "surface", NULL, NULL); // w*hの大きさで surface という名前のウィンドウをつくる
     glfwMakeContextCurrent(*window);
-    glClearColor(0, 0, 0, 1); // 背景色の設定
+    glClearColor(0.5, 0.5, 1.0, 1.0);
     
     reshape(*window, w, h); // 視点の初期化をおこなう
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+ 
+    GLfloat light0pos[] = { 1.0f, 1.0f, 1.0f, 0.0f };    //ライト０の位置を定義
+    GLfloat light_diffuse[] ={ 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat light_ambient[] ={ 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat light_specular[]={ 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat light_emission[]={ 0.0f, 0.0f, 0.0f, 1.0f };
+
+    glLightfv( GL_LIGHT0, GL_POSITION, light0pos );
+    glLightfv( GL_LIGHT0, GL_DIFFUSE,  light_diffuse );
+    glLightfv( GL_LIGHT0, GL_AMBIENT,  light_ambient );
+    glLightfv( GL_LIGHT0, GL_SPECULAR, light_specular );
+    glLightfv( GL_LIGHT0, GL_EMISSION, light_emission );
+
+    GLfloat low_shiness[] = {50};                //鏡面反射係数を定義
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, low_shiness );
 }
 
 
@@ -41,7 +59,7 @@ void reshape(GLFWwindow* window, int w, int h)
    
     gluPerspective(30.0, (double)w / (double)h, 1.0, 100.0);
     gluLookAt(
-        0.0, 4.0, 5.0,    //どこから見てるか
+        0.0, 16.0, 16.0,    //どこから見てるか
         0.0, 0.0, 0.0,    //どこを見てるか
         0.0, 1.0, 0.0    //どの向きが上向きか
     );
@@ -105,6 +123,7 @@ void display(int frame)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    glRotated( 45, 0.0, 1.0, 0.0 );
     makebox(1.0, 1.0, 1.0, GL_POLYGON);
 }
 
