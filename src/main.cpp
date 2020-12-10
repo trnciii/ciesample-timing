@@ -5,6 +5,12 @@
 #include <math.h>
 #include "box.hpp"
 #include <stdio.h>
+#include <stdlib.h>
+
+// 立方体256個＊3次元ぶんの値を保存するためのグローバル変数
+double pos[3*256];
+double vel[3*256];
+bool click = false;
 
 // 登場する関数(いつもの)
 void myinit(GLFWwindow** window);
@@ -47,6 +53,16 @@ void myinit(GLFWwindow** window)
     GLfloat low_shiness[] = {50};                //鏡面反射係数を定義
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, low_shiness );
+    
+    for(int i=0; i<256; i++){
+        pos[3*i  ] = (rand()%100-50)*0.5;
+        pos[3*i+1] = (rand()%100-50)*0.5;
+        pos[3*i+2] = (rand()%100-50)*0.5;
+        
+        vel[3*i  ] = (rand()%100-50)*0.008;
+        vel[3*i+1] = (rand()%100-50)*0.008;
+        vel[3*i+2] = (rand()%100-50)*0.008;
+    }
 }
 
 
@@ -59,7 +75,7 @@ void reshape(GLFWwindow* window, int w, int h)
    
     gluPerspective(30.0, (double)w / (double)h, 1.0, 100.0);
     gluLookAt(
-        0.0, 16.0, 16.0,    //どこから見てるか
+        0.0, 36.0, 36.0,    //どこから見てるか
         0.0, 0.0, 0.0,    //どこを見てるか
         0.0, 1.0, 0.0    //どの向きが上向きか
     );
@@ -102,6 +118,10 @@ void KeyFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
 //--マウスボタン関数------------------------------------------------------------
 void MouseButtonFunc(GLFWwindow* window, int button, int action, int mods)
 {
+    if( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS )
+    {
+        // click = ???;
+    }
 }
 
 //--マウスの位置関数------------------------------------------------------------
@@ -122,9 +142,18 @@ void display(int frame)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    
+    for( int i = 0; i < 256; i++ ){
+        // 座標posにvelを足して更新
+        
+        
 
-    glRotated( 45, 0.0, 1.0, 0.0 );
-    makebox(1.0, 1.0, 1.0, GL_POLYGON);
+        glPushMatrix();
+            glTranslated( pos[3*i], pos[3*i+1], pos[3*i+2] );
+            glRotated( 45, 0.0, 1.0, 0.0 );
+            makebox( 1.0, 1.0, 1.0, GL_POLYGON );
+        glPopMatrix();
+    }
 }
 
 //--メイン関数------------------------------------------------------------------
