@@ -42,6 +42,7 @@
 		3454A8B42530DB3400E7169D /* sample */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sample; sourceTree = BUILT_PRODUCTS_DIR; };
 		3454A8C12530DB6D00E7169D /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3454A8C52530DB8A00E7169D /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		34BB8E7425A8502900879D3C /* stb_image_write.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		34E4E7B725A74C18000F082E /* robo_factory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = robo_factory.cpp; sourceTree = "<group>"; };
 		34E4E7B925A74C20000F082E /* robo_factory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = robo_factory.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -82,6 +83,7 @@
 				34E4E7B725A74C18000F082E /* robo_factory.cpp */,
 				34E4E7B925A74C20000F082E /* robo_factory.h */,
 				3454A8C12530DB6D00E7169D /* main.cpp */,
+				34BB8E7425A8502900879D3C /* stb_image_write.h */,
 			);
 			path = src;
 			sourceTree = "<group>";
