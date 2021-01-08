@@ -4,6 +4,8 @@
 
 ![](docs/tiser.gif)
 
+また、最後には簡単にですが画像を書き出す方法を紹介します。
+
 ## 目次
 * [準備](#準備)
 	* [プログラム解説](#プログラム解説)
@@ -11,7 +13,8 @@
 * [頭と胴体の交差判定](#頭と胴体の交差判定)
 	* [課題1](#課題1)
 	* [課題2](#課題2)
-
+* [画像の書き出し](#画像の書き出し)
+	* [すごく余裕がある人へ](#すごく余裕がある人へ)
 
 ## 準備
 
@@ -236,3 +239,67 @@ void display(int frame)
 
 * 見た目の面白さのため、落下の仕方や左右の動きを変更してください。
 * ゲーム性を高めるため、点数の計算やゲームオーバー判定、難易度の調整などをおこなってください。
+
+
+## 画像の書き出し
+
+まえに質問してきた人がいたので、OpenGLで描画している画面を画像として書き出す方法を紹介します。
+public domain で公開されている[stb](https://github.com/nothings/stb)というライブラリに含まれる、*stb_image_write.h* というライブラリを使います。
+
+といってもこの部分は配布したプログラムにすでに書かれています。スペースを押すと画面全体をキャプチャします。
+
+```cpp
+void KeyFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	// ...
+
+	// スペースキー
+	if( key == GLFW_KEY_SPACE && action == GLFW_PRESS )
+	{
+		printf("SPACE\n");
+
+        int w,h;
+        glfwGetFramebufferSize(window, &w, &h); // 画面サイズの取得
+        
+        unsigned int* image = new unsigned int[w*h]; // ピクセルの配列を用意
+
+		glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, image); // キャプチャ
+
+		stbi_write_png("/適当な場所/capture.png", w, h, 3, image, 3*w); // 書き出し
+
+		delete[] image;
+	}
+	
+	// ...
+}
+```
+
+以上の部分で**画像を受け取る配列の用意**、**画面のキャプチャ**、**画像の保存**をおこなっています。
+
+実はこのままだと画像の上下が逆になるのですが、今回はこのまま進めます。
+すごく余裕がある人は、正しい向きで書き出されるように修正してみるとよい練習になると思います。
+
+
+### 画像を受け取る配列の用意
+まず`glfwGetFramebufferSize`を使って画面の大きさを取得します。`w, h`に幅と高さの値がはいります。
+つぎにピクセルの値を保存する配列を用意します。
+型は`unsigned int`で、`new`を用いてピクセル数分の配列をつくります。
+
+### 画面のキャプチャ
+`glReadPixels`を利用します。
+引数は、取得したい画像の ( 原点x, 原点y, 幅, 高さ, 色, 型, 結果をうけとる配列 ) です。
+原点と幅については以下のようになっていて、ウィンドウ全体に対して青い部分がキャプチャされます。
+画面全体を取得するために、原点と幅、高さをウィンドウと揃えました。
+
+詳しくは[こちら](https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glReadPixels.xml)
+
+<img src="docs/capture.png" width="600">
+
+### 画像の保存
+`stbi_write_png`を利用し、png画像を保存します。
+引数は、( ファイル名, 幅, 高さ, 色の数, 画像の配列, 1行の長さ(色数×幅) ) です。
+保存場所は各自で書き換えてください。
+
+使い方の詳しい説明はソースファイルに書いてあります。(配布したサンプルまたは[ここ](https://github.com/nothings/stb/blob/master/stb_image_write.h))
+
+
