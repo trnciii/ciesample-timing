@@ -5,18 +5,14 @@
 #define ROBO_BODY 2
 
 // ロボットの個数
-#define MAX_ROBO 100
+#define MAX_ROBO 10
 
-// 各ロボット胴体の位置と速度
+// 各ロボット胴体の位置
 double body_pos_x[MAX_ROBO];
 
-// 各ロボット頭の位置と速度
+// 各ロボット頭の位置
 double head_pos_x[MAX_ROBO];
 double head_pos_y[MAX_ROBO];
-
-// 頭の状態
-bool used[MAX_ROBO]; // 落下開始したかのフラグ
-bool complete[MAX_ROBO]; // 本体に合体したかのフラグ
 
 
 // 登場する関数(いつもの)
@@ -52,8 +48,6 @@ void myinit(GLFWwindow** window)
         
         head_pos_x[i] = 0.0;
         head_pos_y[i] = 0.0;
-        used[i] = false;
-        complete[i] = false;
     }
 }
 
@@ -77,39 +71,38 @@ void reshape(GLFWwindow* window, int w, int h)
 void KeyFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     // ↑
-    if( key == GLFW_KEY_UP && action == GLFW_PRESS ){
+    if( key == GLFW_KEY_UP && action == GLFW_PRESS )
+    {
         printf("↑\n");
     }
     
     // ↓
-    if( key == GLFW_KEY_DOWN && action == GLFW_PRESS ){
+    if( key == GLFW_KEY_DOWN && action == GLFW_PRESS )
+    {
         printf("↓\n");
-        
-        for(int i = 0; i < MAX_ROBO; i++){
-            if(used[i] == false){
-                used[i] = true;
-                break;
-            }
-        }
     }
     
     // ←
-    if( key == GLFW_KEY_LEFT && action == GLFW_PRESS ){
+    if( key == GLFW_KEY_LEFT && action == GLFW_PRESS )
+    {
         printf("←\n");
     }
     
     // →
-    if( key == GLFW_KEY_RIGHT && action == GLFW_PRESS ){
+    if( key == GLFW_KEY_RIGHT && action == GLFW_PRESS )
+    {
         printf("→\n");
     }
     
     // スペースキー
-    if( key == GLFW_KEY_SPACE && action == GLFW_PRESS ){
+    if( key == GLFW_KEY_SPACE && action == GLFW_PRESS )
+    {
         printf("SPACE\n");
     }
     
     // Aキー
-    if( key == 'A' && action == GLFW_PRESS ){
+    if( key == 'A' && action == GLFW_PRESS )
+    {
         printf( "A\n" );
     }
 }
@@ -137,44 +130,18 @@ void display(int frame)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    // 頭と本体の衝突判定
-    for(int i = 0; i < MAX_ROBO; i++)
-    {
-        for(int j = 0; j < MAX_ROBO; j++)
-        {
-            bool flag_y = (-7 < head_pos_y[i] ) && ( head_pos_y[i] < -5 );
-            bool flag_x = (-1 < body_pos_x[j] ) && ( body_pos_x[j] <  1 );
-            
-            if( flag_y && flag_x )
-            {
-                complete[i] = true;
-            }
-        }
-    }
     
-    // 本体位置更新
+    // 各胴体位置の更新と描画
     for(int i = 0; i < MAX_ROBO; i++){
 
         body_pos_x[i] += -0.2;
 
-        if(used[i])
-        {
-            if(complete[i])
-            {
-                head_pos_x[i] += -0.2;
-                head_pos_y[i] = -6;
-            }
-            else
-            {
-                head_pos_y[i] += -0.8;
-            }
-        }
-        
+        // 体の描画
         glTranslated( body_pos_x[i], 0.0, 0.0 );
         glCallList( ROBO_BODY );
         glLoadIdentity();
         
+        // 頭の描画
         glTranslated( head_pos_x[i], head_pos_y[i], 0.0 );
         glCallList( ROBO_HEAD );
         glLoadIdentity();
