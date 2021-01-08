@@ -1,16 +1,23 @@
+#include "robo_factory.h"
 
-#define GL_SILENCE_DEPRECATION
-#define GLFW_INCLUDE_GLU
-#include "GLFW/glfw3.h"
-#include <math.h>
-#include "box.hpp"
-#include <stdio.h>
-#include <stdlib.h>
+// ディスプレイリストの定義
+#define ROBO_HEAD 1
+#define ROBO_BODY 2
 
-// 立方体256個＊3次元ぶんの値を保存するためのグローバル変数
-double pos[3*256];
-double vel[3*256];
-bool clicked = false;
+// ロボットの個数
+#define MAX_ROBO 100
+
+// 各ロボット胴体の位置と速度
+double body_pos_x[MAX_ROBO];
+
+// 各ロボット頭の位置と速度
+double head_pos_x[MAX_ROBO];
+double head_pos_y[MAX_ROBO];
+
+// 頭の状態
+bool used[MAX_ROBO]; // 落下開始したかのフラグ
+bool complete[MAX_ROBO]; // 本体に合体したかのフラグ
+
 
 // 登場する関数(いつもの)
 void myinit(GLFWwindow** window);
@@ -29,39 +36,24 @@ void myinit(GLFWwindow** window)
     
     int w = 600; // ウィンドウの幅
     int h = 600; // ウィンドウの高さ
-    *window = glfwCreateWindow(w, h, "surface", NULL, NULL); // w*hの大きさで surface という名前のウィンドウをつくる
+    *window = glfwCreateWindow(w, h, "surface", NULL, NULL);
     glfwMakeContextCurrent(*window);
     glClearColor(0.5, 0.5, 1.0, 1.0);
     
     reshape(*window, w, h); // 視点の初期化をおこなう
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
  
-    GLfloat light0pos[] = { 1.0f, 1.0f, 1.0f, 0.0f };    //ライト０の位置を定義
-    GLfloat light_diffuse[] ={ 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat light_ambient[] ={ 0.2f, 0.2f, 0.2f, 1.0f };
-    GLfloat light_specular[]={ 0.2f, 0.2f, 0.2f, 1.0f };
-    GLfloat light_emission[]={ 0.0f, 0.0f, 0.0f, 1.0f };
+    MakeListRoboHead( ROBO_HEAD );
+    MakeListRoboBody( ROBO_BODY );
 
-    glLightfv( GL_LIGHT0, GL_POSITION, light0pos );
-    glLightfv( GL_LIGHT0, GL_DIFFUSE,  light_diffuse );
-    glLightfv( GL_LIGHT0, GL_AMBIENT,  light_ambient );
-    glLightfv( GL_LIGHT0, GL_SPECULAR, light_specular );
-    glLightfv( GL_LIGHT0, GL_EMISSION, light_emission );
-
-    GLfloat low_shiness[] = {50};                //鏡面反射係数を定義
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, low_shiness );
-    
-    for(int i=0; i<256; i++){
-        pos[3*i  ] = (rand()%100-50)*0.5;
-        pos[3*i+1] = (rand()%100-50)*0.5;
-        pos[3*i+2] = (rand()%100-50)*0.5;
+    //座標の初期化
+    for(int i = 0; i < MAX_ROBO; i++){
+        body_pos_x[i] = i*4+8;
         
-        vel[3*i  ] = (rand()%100-50)*0.008;
-        vel[3*i+1] = (rand()%100-50)*0.008;
-        vel[3*i+2] = (rand()%100-50)*0.008;
+        head_pos_x[i] = 0.0;
+        head_pos_y[i] = 0.0;
+        used[i] = false;
+        complete[i] = false;
     }
 }
 
@@ -75,9 +67,9 @@ void reshape(GLFWwindow* window, int w, int h)
    
     gluPerspective(30.0, (double)w / (double)h, 1.0, 100.0);
     gluLookAt(
-        0.0, 36.0, 36.0,    //どこから見てるか
-        0.0, 0.0, 0.0,    //どこを見てるか
-        0.0, 1.0, 0.0    //どの向きが上向きか
+        0.0, 0.0,30.0, //どこから見てるか
+        0.0, 0.0, 0.0, //どこを見てるか
+        0.0, 1.0, 0.0  //どの向きが上向きか
     );
 }
 
@@ -92,6 +84,13 @@ void KeyFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
     // ↓
     if( key == GLFW_KEY_DOWN && action == GLFW_PRESS ){
         printf("↓\n");
+        
+        for(int i = 0; i < MAX_ROBO; i++){
+            if(used[i] == false){
+                used[i] = true;
+                break;
+            }
+        }
     }
     
     // ←
@@ -118,10 +117,6 @@ void KeyFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
 //--マウスボタン関数------------------------------------------------------------
 void MouseButtonFunc(GLFWwindow* window, int button, int action, int mods)
 {
-    if( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS )
-    {
-        // clicked = ???;
-    }
 }
 
 //--マウスの位置関数------------------------------------------------------------
@@ -142,17 +137,47 @@ void display(int frame)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
-    for( int i = 0; i < 256; i++ ){
-        // 座標posにvelを足して更新
-        
-        
 
-        glPushMatrix();
-            glTranslated( pos[3*i], pos[3*i+1], pos[3*i+2] );
-            glRotated( 45, 0.0, 1.0, 0.0 );
-            makebox( 1.0, 1.0, 1.0, GL_POLYGON );
-        glPopMatrix();
+    // 頭と本体の衝突判定
+    for(int i = 0; i < MAX_ROBO; i++)
+    {
+        for(int j = 0; j < MAX_ROBO; j++)
+        {
+            bool flag_y = (-7 < head_pos_y[i] ) && ( head_pos_y[i] < -5 );
+            bool flag_x = (-1 < body_pos_x[j] ) && ( body_pos_x[j] <  1 );
+            
+            if( flag_y && flag_x )
+            {
+                complete[i] = true;
+            }
+        }
+    }
+    
+    // 本体位置更新
+    for(int i = 0; i < MAX_ROBO; i++){
+
+        body_pos_x[i] += -0.2;
+
+        if(used[i])
+        {
+            if(complete[i])
+            {
+                head_pos_x[i] += -0.2;
+                head_pos_y[i] = -6;
+            }
+            else
+            {
+                head_pos_y[i] += -0.8;
+            }
+        }
+        
+        glTranslated( body_pos_x[i], 0.0, 0.0 );
+        glCallList( ROBO_BODY );
+        glLoadIdentity();
+        
+        glTranslated( head_pos_x[i], head_pos_y[i], 0.0 );
+        glCallList( ROBO_HEAD );
+        glLoadIdentity();
     }
 }
 
