@@ -32,8 +32,8 @@ void MouseWheelFunc(GLFWwindow* window, double x, double y);
 void myinit(GLFWwindow** window)
 {
 	glfwInit();
-    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
-    
+	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
+	
 	int w = 600; // ウィンドウの幅
 	int h = 600; // ウィンドウの高さ
 	*window = glfwCreateWindow(w, h, "surface", NULL, NULL);
@@ -103,15 +103,15 @@ void KeyFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		printf("SPACE\n");
 
-        int w,h;
-        glfwGetFramebufferSize(window, &w, &h);
-        unsigned int* image = new unsigned int[w*h];
-        
+		int w,h;
+		glfwGetFramebufferSize(window, &w, &h);
+		unsigned int* image = new unsigned int[w*h];
+		
 		glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, image);
 		
-        stbi_write_png("/適当な場所/capture.png", w, h, 3, image, 3*w);
-        
-        delete[] image;
+		stbi_write_png("/適当な場所/capture.png", w, h, 3, image, 3*w);
+		
+		delete[] image;
 	}
 	
 	// Aキー
