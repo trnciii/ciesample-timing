@@ -32,7 +32,8 @@ void MouseWheelFunc(GLFWwindow* window, double x, double y);
 void myinit(GLFWwindow** window)
 {
 	glfwInit();
-	
+    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
+    
 	int w = 600; // ウィンドウの幅
 	int h = 600; // ウィンドウの高さ
 	*window = glfwCreateWindow(w, h, "surface", NULL, NULL);
