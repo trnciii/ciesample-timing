@@ -215,10 +215,10 @@ void display(int frame)
 		// ここを書き換える
 	}
 
-    // 各胴体位置の更新と描画
-    for(int i = 0; i < MAX_ROBO; i++){
-    	// ...
-    }
+	// 各胴体位置の更新と描画
+	for(int i = 0; i < MAX_ROBO; i++){
+		// ...
+	}
 ```
 
 これで、各頭が胴体と合体したかどうかの配列`hit`が得られました。
@@ -244,7 +244,7 @@ void display(int frame)
 ## 画像の書き出し
 
 まえに質問してきた人がいたので、OpenGLで描画している画面を画像として書き出す方法を紹介します。
-public domain で公開されている[stb](https://github.com/nothings/stb)というライブラリに含まれる、*stb_image_write.h* というライブラリを使います。
+public domain で公開されている[stb](https://github.com/nothings/stb)というライブラリに含まれる、[stb_image_write.h](https://github.com/nothings/stb/blob/master/stb_image_write.h)というヘッダファイルを使います。
 
 といってもこの部分は配布したプログラムにすでに書かれています。スペースを押すと画面全体をキャプチャします。
 
@@ -258,10 +258,10 @@ void KeyFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		printf("SPACE\n");
 
-        int w,h;
-        glfwGetFramebufferSize(window, &w, &h); // 画面サイズの取得
-        
-        unsigned int* image = new unsigned int[w*h]; // ピクセルの配列を用意
+		int w,h;
+		glfwGetFramebufferSize(window, &w, &h); // 画面サイズの取得
+		
+		unsigned int* image = new unsigned int[w*h]; // ピクセルの配列を用意
 
 		glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, image); // キャプチャ
 
